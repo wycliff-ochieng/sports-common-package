@@ -1,0 +1,44 @@
+syntax="proto3";
+
+package team_service_v1;
+
+option go_package = "github.com/wycliff-ochieng/sports-proto/team_grpc/team_proto";
+
+
+service TeamRPC{
+    rpc GetTeamSummary(GetTeamSummaryRequest) returns(GetTeamSummaryResponse){}
+    rpc CheckTeamMembership(GetTeamMembershipRequest) returns(GetTeamMembershipResponse){}
+    //rpc GetTeamMembers(GetTeamMembersRequest) returns(GetTeamMembersRequest){}
+}
+
+message GetTeamSummaryRequest{
+    string team_id = 1;
+}
+
+message GetTeamSummaryResponse{
+    repeated TeamMember members = 1;
+    //map <string,TeamSummary> teams = 1;
+}
+
+message GetTeamMembershipRequest{
+    string team_id = 1;
+    repeated string user_id = 2;
+}
+
+message GetTeamMembershipResponse{
+    map <string, TeamMember> members = 1;
+}
+
+
+message TeamSummary{
+    string team_id = 1;
+    string name =2;
+    string sport =3;
+    string description =4;
+}
+
+message TeamMember{
+    string user_id = 1;
+    string team_id =2;
+    string role = 3;
+}

@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package userservice_v1;
+
+option go_package = "github.com/wycliff-ochieng/sports-proto/user_grpc/user_proto"; //where the request /response code generated will be stored;
+
+service UserServiceRPC{
+    rpc GetUserProfile(GetUserRequest) returns(GetUserProfileResponse) {}
+    rpc GetUserProfiles(GetUserRequest) returns (GetUserProfileResponse) {}
+    
+}
+
+message GetUserRequest{
+    repeated string userid = 1;
+}
+
+message UserProfile{
+    string userid = 1;
+    string firstname = 2;
+    string lastname = 3;
+    string teamid = 4;
+    string email = 5;
+    string createdat =6;
+    string updatedat = 7;
+}
+
+
+
+message GetUserProfileResponse{
+    map<string,UserProfile> profiles = 1;
+}
