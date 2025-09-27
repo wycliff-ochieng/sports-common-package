@@ -16,18 +16,29 @@ type ContextKey string
 
 // Define the keys that will be used to store/retrieve values from the context.
 const (
-	UserUUIDKey ContextKey = "userUuid"
+	UserUUIDKey ContextKey = "userid"
 	RolesKey    ContextKey = "roles"
 	// Add other keys like UserIDKey if you need them.
 )
+
+/*type Claims struct {
+	ID     int       `json:"id"`
+	UserID uuid.UUID `json:"userid"`
+	Roles  []string  `json:"roles"`
+	Email  string    `json:"email"`
+	jwt.RegisteredClaims
+}
+
 
 type AppClaims struct {
 	// We will use standard JWT claim names for better interoperability.
 	// "sub" (Subject) is the standard claim for the user's unique identifier.
 	UserUUID string   `json:"sub"`
 	Roles    []string `json:"roles"`
+	Email string `json:"email"`
 	jwt.RegisteredClaims
 }
+*/
 
 // AuthMiddleware creates a middleware that validates a JWT and populates the context.
 func AuthMiddleware(jwtSecret string, logger *slog.Logger) func(next http.Handler) http.Handler {
@@ -46,7 +57,7 @@ func AuthMiddleware(jwtSecret string, logger *slog.Logger) func(next http.Handle
 			}
 
 			// Parse and validate the token using the shared AppClaims struct.
-			token, err := jwt.ParseWithClaims(tokenString, &AppClaims{}, func(token *jwt.Token) (interface{}, error) {
+			token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 					return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 				}
@@ -61,9 +72,9 @@ func AuthMiddleware(jwtSecret string, logger *slog.Logger) func(next http.Handle
 			}
 
 			// The type assertion now uses the shared auth.AppClaims.
-			if claims, ok := token.Claims.(*AppClaims); ok && claims != nil {
+			if claims, ok := token.Claims.(*Claims); ok && claims != nil {
 				// Populate the context with the claims.
-				ctx := context.WithValue(r.Context(), UserUUIDKey, claims.UserUUID)
+				ctx := context.WithValue(r.Context(), UserUUIDKey, claims.UserID)
 				ctx = context.WithValue(ctx, RolesKey, claims.Roles)
 				// Pass the new context to the next handler.
 				next.ServeHTTP(w, r.WithContext(ctx))
